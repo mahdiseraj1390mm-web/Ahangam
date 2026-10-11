@@ -91,16 +91,18 @@ export function SongUploadForm({ artists, albums, genres }: SongUploadFormProps)
           method: "POST",
           body: formData,
         });
-        const data = await res.json();
-        if (res.ok && data.url) {
+        const data = await res.json().catch(() => null);
+        if (res.ok && data?.url) {
           setUrl320(data.url);
+          setSuccess("فایل صوتی با موفقیت در فضای ابری آپلود شد!");
+          setTimeout(() => setSuccess(null), 4000);
         } else {
-          setError(data.message || "آپلود فایل به سرور با خطا مواجه شد. از فایل نمونه استفاده شد.");
-          setUrl320("/audio/sample.mp3");
+          const errMsg = data?.message || `خطای سرور (${res.status} ${res.statusText})`;
+          setError(`خطا در آپلود: ${errMsg}`);
         }
-      } catch {
-        setError("خطای اتصال به سرور در آپلود فایل. از فایل صوتی نمونه استفاده شد.");
-        setUrl320("/audio/sample.mp3");
+      } catch (uploadErr: any) {
+        console.error("Audio upload error:", uploadErr);
+        setError(`خطای آپلود: ${uploadErr?.message || "مشکل در اتصال به سرور"}`);
       } finally {
         setIsUploadingFile(false);
       }
