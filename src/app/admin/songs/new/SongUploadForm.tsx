@@ -88,13 +88,14 @@ export function SongUploadForm({ artists, albums, genres }: SongUploadFormProps)
         setError(null);
         
         let fileUrl = "";
+        const safeBlobName = `${Date.now()}-${file.name.replace(/[^\w.-]/g, "_")}`;
         try {
-          const newBlob = await upload(file.name, file, {
+          const newBlob = await upload(safeBlobName, file, {
             access: "public",
             handleUploadUrl: "/api/upload/client",
           });
           fileUrl = newBlob.url;
-        } catch (directErr) {
+        } catch (directErr: any) {
           console.warn("Direct blob client upload fallback to api/upload:", directErr);
           const formData = new FormData();
           formData.append("file", file);
@@ -133,8 +134,9 @@ export function SongUploadForm({ artists, albums, genres }: SongUploadFormProps)
         setError(null);
         
         let coverUrl = "";
+        const safeCoverName = `${Date.now()}-${file.name.replace(/[^\w.-]/g, "_")}`;
         try {
-          const newBlob = await upload(file.name, file, {
+          const newBlob = await upload(safeCoverName, file, {
             access: "public",
             handleUploadUrl: "/api/upload/client",
           });

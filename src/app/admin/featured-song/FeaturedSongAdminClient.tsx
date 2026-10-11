@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
+import { upload } from "@vercel/blob/client";
 import {
   Sparkles,
   Check,
@@ -131,23 +132,35 @@ export function FeaturedSongAdminClient({
         }
       };
 
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const data = await res.json();
+      let fileUrl = "";
+      try {
+        const newBlob = await upload(file.name, file, {
+          access: "public",
+          handleUploadUrl: "/api/upload/client",
+        });
+        fileUrl = newBlob.url;
+      } catch {
+        const fd = new FormData();
+        fd.append("file", file);
+        const res = await fetch("/api/upload", { method: "POST", body: fd });
+        const data = await res.json().catch(() => null);
+        if (res.ok && data?.url) {
+          fileUrl = data.url;
+        } else {
+          throw new Error(data?.message || "خطا در آپلود فایل صوتی.");
+        }
+      }
 
-      if (res.ok && data.url) {
-        setAudioUrl(data.url);
+      if (fileUrl) {
+        setAudioUrl(fileUrl);
         setIsNewAudioUploaded(true);
         setMsg({
-          text: `فایل صوتی جدید (${file.name}) آپلود شد. برای اعمال نهایی و دائمی، دکمه ذخیره زیر را بزنید.`,
+          text: `فایل صوتی جدید (${file.name}) با موفقیت در فضای ابری آپلود شد. برای اعمال نهایی دکمه ذخیره زیر را بزنید.`,
           type: "success",
         });
-      } else {
-        alert(data.message || "خطا در آپلود فایل صوتی.");
       }
-    } catch {
-      alert("خطای ارتباط با سرور هنگام آپلود فایل صوتی.");
+    } catch (err: any) {
+      alert(`خطا در آپلود فایل صوتی: ${err?.message || "مشکل در اتصال به سرور"}`);
     } finally {
       setIsUploadingAudio(false);
     }
@@ -161,18 +174,34 @@ export function FeaturedSongAdminClient({
     try {
       setIsUploadingImage(true);
       setMsg(null);
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const data = await res.json();
-
-      if (res.ok && data.url) {
-        setBannerImage(data.url);
-      } else {
-        alert(data.message || "خطا در آپلود تصویر.");
+      let imageUrl = "";
+      try {
+        const newBlob = await upload(file.name, file, {
+          access: "public",
+          handleUploadUrl: "/api/upload/client",
+        });
+        imageUrl = newBlob.url;
+      } catch {
+        const fd = new FormData();
+        fd.append("file", file);
+        const res = await fetch("/api/upload", { method: "POST", body: fd });
+        const data = await res.json().catch(() => null);
+        if (res.ok && data?.url) {
+          imageUrl = data.url;
+        } else {
+          throw new Error(data?.message || "خطا در آپلود تصویر.");
+        }
       }
-    } catch {
-      alert("خطای ارتباط با سرور در آپلود تصویر.");
+
+      if (imageUrl) {
+        setBannerImage(imageUrl);
+        setMsg({
+          text: "تصویر بنر با موفقیت آپلود شد.",
+          type: "success",
+        });
+      }
+    } catch (err: any) {
+      alert(`خطا در آپلود تصویر: ${err?.message || "مشکل در اتصال"}`);
     } finally {
       setIsUploadingImage(false);
     }

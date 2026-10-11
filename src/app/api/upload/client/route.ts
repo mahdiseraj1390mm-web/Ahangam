@@ -17,21 +17,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         }
 
         return {
-          allowedContentTypes: [
-            "audio/mpeg",
-            "audio/mp3",
-            "audio/wav",
-            "audio/ogg",
-            "audio/aac",
-            "audio/m4a",
-            "audio/x-m4a",
-            "audio/mp4",
-            "image/jpeg",
-            "image/png",
-            "image/webp",
-            "image/gif",
-          ],
-          maximumSizeInBytes: 100 * 1024 * 1024, // 100MB per file
+          maximumSizeInBytes: 500 * 1024 * 1024, // 500MB per file
         };
       },
       onUploadCompleted: async ({ blob, tokenPayload }) => {
