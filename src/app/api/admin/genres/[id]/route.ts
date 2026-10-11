@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 // PATCH /api/admin/genres/[id] - Update a genre
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { authorized } = await checkAdminPermission();
   if (!authorized) {
@@ -16,7 +16,7 @@ export async function PATCH(
 
   try {
     const { name, slug, description, isMood } = await request.json();
-    const genreId = params.id;
+    const { id: genreId } = await params;
 
     const dataToUpdate: any = {};
     if (name && typeof name === "string") dataToUpdate.name = name.trim();
@@ -46,7 +46,7 @@ export async function PATCH(
 // DELETE /api/admin/genres/[id] - Delete a genre and its connections
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { authorized } = await checkAdminPermission();
   if (!authorized) {
@@ -54,7 +54,7 @@ export async function DELETE(
   }
 
   try {
-    const genreId = params.id;
+    const { id: genreId } = await params;
 
     // Delete relation records first, then the genre
     await prisma.songGenre.deleteMany({

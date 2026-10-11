@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 // POST /api/admin/genres/[id]/songs - Add a song to this genre
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { authorized } = await checkAdminPermission();
   if (!authorized) {
@@ -20,7 +20,7 @@ export async function POST(
       return NextResponse.json({ error: "شناسه آهنگ الزامی است" }, { status: 400 });
     }
 
-    const genreId = params.id;
+    const { id: genreId } = await params;
 
     // Check if already in genre
     const existing = await prisma.songGenre.findUnique({
@@ -51,7 +51,7 @@ export async function POST(
 // DELETE /api/admin/genres/[id]/songs?songId=... - Remove a song from this genre
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { authorized } = await checkAdminPermission();
   if (!authorized) {
@@ -65,7 +65,7 @@ export async function DELETE(
       return NextResponse.json({ error: "شناسه آهنگ الزامی است" }, { status: 400 });
     }
 
-    const genreId = params.id;
+    const { id: genreId } = await params;
 
     await prisma.songGenre.deleteMany({
       where: {
