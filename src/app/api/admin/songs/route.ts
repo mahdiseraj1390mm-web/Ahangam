@@ -29,12 +29,13 @@ export async function POST(req: NextRequest) {
       qualities,
     } = body;
 
-    // Generate unique slug
-    const cleanTitle = title
+    // Generate unique slug safely
+    const cleanTitle = (title || "")
+      .trim()
       .toLowerCase()
       .replace(/[^\w\u0600-\u06FF\s-]/g, "")
       .replace(/\s+/g, "-");
-    const slug = `${cleanTitle}-${Date.now().toString().slice(-4)}`;
+    const slug = `${cleanTitle || "song"}-${Date.now().toString().slice(-4)}`;
 
     // Ensure valid artistId
     let finalArtistId = artistId;

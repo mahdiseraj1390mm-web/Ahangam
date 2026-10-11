@@ -133,13 +133,15 @@ export function FeaturedSongAdminClient({
       };
 
       let fileUrl = "";
+      const safeBlobName = `${Date.now()}-${file.name.replace(/[^\w.-]/g, "_")}`;
       try {
-        const newBlob = await upload(file.name, file, {
+        const newBlob = await upload(safeBlobName, file, {
           access: "public",
           handleUploadUrl: "/api/upload/client",
         });
         fileUrl = newBlob.url;
-      } catch {
+      } catch (directErr: any) {
+        console.warn("Direct blob client upload fallback to api/upload:", directErr);
         const fd = new FormData();
         fd.append("file", file);
         const res = await fetch("/api/upload", { method: "POST", body: fd });
@@ -147,7 +149,7 @@ export function FeaturedSongAdminClient({
         if (res.ok && data?.url) {
           fileUrl = data.url;
         } else {
-          throw new Error(data?.message || "خطا در آپلود فایل صوتی.");
+          throw new Error(data?.message || directErr?.message || "خطا در آپلود فایل صوتی.");
         }
       }
 
