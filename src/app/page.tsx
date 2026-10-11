@@ -26,57 +26,71 @@ export const revalidate = 0; // Dynamic server rendering with real DB data
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  // Parallelize all DB queries for ultra-fast response
-  const [
-    storiesRaw,
-    editorPicksRaw,
-    newSongsRaw,
-    popularSongsRaw,
-    artistsRaw,
-    albumsRaw,
-    genres,
-    dailySetting,
-    topSongsSetting,
-  ] = await Promise.all([
-    prisma.story.findMany({
-      where: { isActive: true },
-      orderBy: { sortOrder: "asc" },
-    }),
-    prisma.song.findMany({
-      where: { status: "PUBLISHED", isEditorPick: true },
-      include: { artist: true, album: true, qualities: true },
-      take: 6,
-    }),
-    prisma.song.findMany({
-      where: { status: "PUBLISHED" },
-      include: { artist: true, album: true, qualities: true },
-      orderBy: { createdAt: "desc" },
-      take: 8,
-    }),
-    prisma.song.findMany({
-      where: { status: "PUBLISHED" },
-      include: { artist: true, album: true, qualities: true },
-      orderBy: { playCount: "desc" },
-      take: 6,
-    }),
-    prisma.artist.findMany({
-      orderBy: { followersCount: "desc" },
-      take: 6,
-    }),
-    prisma.album.findMany({
-      include: { artist: true },
-      take: 4,
-    }),
-    prisma.genre.findMany({
-      orderBy: { sortOrder: "asc" },
-    }),
-    prisma.siteSetting.findUnique({
-      where: { key: "FEATURED_SONG_OF_THE_DAY" },
-    }),
-    prisma.siteSetting.findUnique({
-      where: { key: "TOP_SONGS_CONFIG" },
-    }),
-  ]);
+  // Parallelize all DB queries with fallback for serverless safety
+  let storiesRaw: any[] = [];
+  let editorPicksRaw: any[] = [];
+  let newSongsRaw: any[] = [];
+  let popularSongsRaw: any[] = [];
+  let artistsRaw: any[] = [];
+  let albumsRaw: any[] = [];
+  let genres: any[] = [];
+  let dailySetting: any = null;
+  let topSongsSetting: any = null;
+
+  try {
+    const results = await Promise.all([
+      prisma.story.findMany({
+        where: { isActive: true },
+        orderBy: { sortOrder: "asc" },
+      }).catch(() => []),
+      prisma.song.findMany({
+        where: { status: "PUBLISHED", isEditorPick: true },
+        include: { artist: true, album: true, qualities: true },
+        take: 6,
+      }).catch(() => []),
+      prisma.song.findMany({
+        where: { status: "PUBLISHED" },
+        include: { artist: true, album: true, qualities: true },
+        orderBy: { createdAt: "desc" },
+        take: 8,
+      }).catch(() => []),
+      prisma.song.findMany({
+        where: { status: "PUBLISHED" },
+        include: { artist: true, album: true, qualities: true },
+        orderBy: { playCount: "desc" },
+        take: 6,
+      }).catch(() => []),
+      prisma.artist.findMany({
+        orderBy: { followersCount: "desc" },
+        take: 6,
+      }).catch(() => []),
+      prisma.album.findMany({
+        include: { artist: true },
+        take: 4,
+      }).catch(() => []),
+      prisma.genre.findMany({
+        orderBy: { sortOrder: "asc" },
+      }).catch(() => []),
+      prisma.siteSetting.findUnique({
+        where: { key: "FEATURED_SONG_OF_THE_DAY" },
+      }).catch(() => null),
+      prisma.siteSetting.findUnique({
+        where: { key: "TOP_SONGS_CONFIG" },
+      }).catch(() => null),
+    ]);
+
+    storiesRaw = results[0];
+    editorPicksRaw = results[1];
+    newSongsRaw = results[2];
+    popularSongsRaw = results[3];
+    artistsRaw = results[4];
+    albumsRaw = results[5];
+    genres = results[6];
+    dailySetting = results[7];
+    topSongsSetting = results[8];
+  } catch (err) {
+    console.error("Home page DB load warning:", err);
+  }
 
   const stories: StoryItem[] = storiesRaw.map((s) => ({
     ...s,
