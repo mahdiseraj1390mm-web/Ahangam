@@ -1,0 +1,398 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  USER
+  VIP
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  SCHEDULED
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model User {
+  id                   String            @id @default(cuid())
+  phone                String            @unique
+  displayName          String
+  passwordHash         String
+  role                 Role              @default(USER)
+  avatar               String?
+  bio                  String?
+  permissions          String?           // JSON string of granular permissions for sub-admins
+  subscriptionExpiresAt DateTime?
+  isBanned             Boolean           @default(false)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  playlists            Playlist[]
+  favorites            Favorite[]
+  follows              Follow[]
+  playHistories        PlayHistory[]
+  comments             Comment[]
+  ratings              Rating[]
+  tickets              SupportTicket[]
+  subscriptions        UserSubscription[]
+  auditLogs            AdminAuditLog[]
+}
+
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action     String   // e.g. "CREATE_SONG", "DELETE_USER", "UPDATE_PERMISSIONS"
+  targetType String   // e.g. "Song", "User", "Theme"
+  targetId   String?
+  details    String?  // JSON string or notes
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+}
+
+model Artist {
+  id             String       @id @default(cuid())
+  name           String
+  slug           String       @unique
+  bio            String?
+  image          String?
+  isFeatured     Boolean      @default(false)
+  followersCount Int          @default(0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  songs          Song[]
+  albums         Album[]
+  musicVideos    MusicVideo[]
+  followers      Follow[]
+}
+
+model Album {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  artistId    String
+  artist      Artist   @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  coverImage  String?
+  releaseYear Int?
+  description String?
+  isFeatured  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  songs       Song[]
+}
+
+model Genre {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  slug        String     @unique
+  icon        String?
+  description String?
+  isMood      Boolean    @default(false) // true = Mood (شاد، رانندگی، آرامش...), false = Genre (پاپ، سنتی...)
+  sortOrder   Int        @default(0)
+  createdAt   DateTime   @default(now())
+
+  songs       SongGenre[]
+}
+
+model Song {
+  id             String        @id @default(cuid())
+  title          String
+  slug           String        @unique
+  artistId       String
+  artist         Artist        @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  albumId        String?
+  album          Album?        @relation(fields: [albumId], references: [id], onDelete: SetNull)
+  duration       Int           @default(0) // seconds
+  coverImage     String?
+  lyrics         String?
+  syncedLyrics   String?       // LRC or JSON synced timestamp array
+  lyricist       String?
+  composer       String?
+  arranger       String?
+  publisher      String?
+  description    String?
+  playCount      Int           @default(0)
+  downloadCount  Int           @default(0)
+  isFeatured     Boolean       @default(false)
+  isEditorPick   Boolean       @default(false)
+  status         ContentStatus @default(PUBLISHED)
+  scheduledAt    DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  qualities      SongQuality[]
+  genres         SongGenre[]
+  playlistSongs  PlaylistSong[]
+  favorites      Favorite[]
+  comments       Comment[]
+  ratings        Rating[]
+  playHistories  PlayHistory[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([isFeatured])
+  @@index([isEditorPick])
+  @@index([artistId])
+}
+
+model SongGenre {
+  songId  String
+  genreId String
+  song    Song  @relation(fields: [songId], references: [id], onDelete: Cascade)
+  genre   Genre @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([songId, genreId])
+}
+
+model SongQuality {
+  id        String   @id @default(cuid())
+  songId    String
+  song      Song     @relation(fields: [songId], references: [id], onDelete: Cascade)
+  quality   String   // "128", "320", "FLAC"
+  fileUrl   String
+  fileSize  Int?     // bytes
+  isDefault Boolean  @default(false)
+}
+
+model MusicVideo {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  artistId    String
+  artist      Artist   @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  coverImage  String?
+  videoUrl    String
+  duration    Int      @default(0) // seconds
+  description String?
+  viewsCount  Int      @default(0)
+  isFeatured  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Playlist {
+  id          String         @id @default(cuid())
+  title       String
+  slug        String         @unique
+  description String?
+  coverImage  String?
+  userId      String?
+  user        User?          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isSystem    Boolean        @default(false) // curated by editorial/admin
+  isPublic    Boolean        @default(true)
+  isFeatured  Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  songs       PlaylistSong[]
+}
+
+model PlaylistSong {
+  id         String   @id @default(cuid())
+  playlistId String
+  playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  songId     String
+  song       Song     @relation(fields: [songId], references: [id], onDelete: Cascade)
+  orderIndex Int      @default(0)
+  addedAt    DateTime @default(now())
+
+  @@unique([playlistId, songId])
+}
+
+model Story {
+  id          String    @id @default(cuid())
+  title       String
+  caption     String?
+  mediaUrl    String
+  mediaType   String    @default("IMAGE") // "IMAGE" | "VIDEO"
+  targetUrl   String?
+  targetType  String?   // "SONG" | "ARTIST" | "ALBUM" | "EXTERNAL"
+  targetId    String?
+  expiresAt   DateTime?
+  isActive    Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  viewsCount  Int       @default(0)
+  createdAt   DateTime  @default(now())
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  songId    String
+  song      Song     @relation(fields: [songId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, songId])
+}
+
+model Follow {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  artistId  String
+  artist    Artist   @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, artistId])
+}
+
+model PlayHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  songId    String
+  song      Song     @relation(fields: [songId], references: [id], onDelete: Cascade)
+  playedAt  DateTime @default(now())
+}
+
+model Comment {
+  id        String           @id @default(cuid())
+  songId    String
+  song      Song             @relation(fields: [songId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parentId  String?
+  parent    Comment?         @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[]        @relation("CommentReplies")
+  text      String
+  status    ModerationStatus @default(APPROVED)
+  likesCount Int             @default(0)
+  createdAt DateTime         @default(now())
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  songId    String
+  song      Song     @relation(fields: [songId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  score     Int      // 1 to 5
+  createdAt DateTime @default(now())
+
+  @@unique([userId, songId])
+}
+
+model SupportTicket {
+  id          String          @id @default(cuid())
+  userId      String?
+  user        User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name        String
+  contact     String          // phone or email
+  subject     String
+  category    String          // "TECHNICAL", "CONTENT", "ACCOUNT", "PAYMENT", "SUGGESTION"
+  status      TicketStatus    @default(OPEN)
+  priority    String          @default("NORMAL") // "LOW", "NORMAL", "HIGH"
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  messages    TicketMessage[]
+}
+
+model TicketMessage {
+  id            String        @id @default(cuid())
+  ticketId      String
+  ticket        SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  senderId      String?
+  senderRole    String        // "USER" | "ADMIN"
+  senderName    String
+  message       String
+  attachmentUrl String?
+  createdAt     DateTime      @default(now())
+}
+
+model SubscriptionPlan {
+  id                  String             @id @default(cuid())
+  name                String
+  description         String?
+  durationDays        Int                @default(30)
+  price               Int                @default(0) // Tomans
+  downloadLimitPerDay Int                @default(100)
+  maxQuality          String             @default("320")
+  isActive            Boolean            @default(true)
+  sortOrder           Int                @default(0)
+
+  userSubscriptions   UserSubscription[]
+}
+
+model UserSubscription {
+  id             String           @id @default(cuid())
+  userId         String
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId         String
+  plan           SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  startsAt       DateTime         @default(now())
+  endsAt         DateTime
+  status         String           @default("ACTIVE") // "ACTIVE" | "EXPIRED" | "CANCELLED"
+  transactionRef String?
+  amountPaid     Int              @default(0)
+  createdAt      DateTime         @default(now())
+}
+
+model SiteSetting {
+  key         String  @id
+  value       String
+  group       String  @default("GENERAL") // "GENERAL", "APPEARANCE", "THEME", "SEO", "PLAYER"
+  description String?
+}
+
+model HomeSection {
+  id            String   @id @default(cuid())
+  key           String   @unique
+  title         String
+  sortOrder     Int      @default(0)
+  isEnabled     Boolean  @default(true)
+  showOnMobile  Boolean  @default(true)
+  showOnDesktop Boolean  @default(true)
+  limitCount    Int      @default(10)
+}
+
+model SocialLink {
+  id        String   @id @default(cuid())
+  platform  String   // "INSTAGRAM", "TELEGRAM", "RUBIKA", "BALE", "EITAA", "WHATSAPP", "CUSTOM"
+  title     String
+  url       String
+  icon      String?
+  sortOrder Int      @default(0)
+  isEnabled Boolean  @default(true)
+}
+
+model SearchLog {
+  id           String   @id @default(cuid())
+  query        String
+  resultsCount Int      @default(0)
+  createdAt    DateTime @default(now())
+}
+
+model ContentReport {
+  id             String   @id @default(cuid())
+  contentType    String   // "SONG", "COMMENT", "AUDIO_ERROR"
+  contentId      String
+  reason         String
+  description    String?
+  reporterUserId String?
+  status         String   @default("PENDING") // "PENDING", "REVIEWED", "DISMISSED"
+  createdAt      DateTime @default(now())
+}
