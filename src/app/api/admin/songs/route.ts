@@ -105,22 +105,28 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Audit log
-    await prisma.adminAuditLog.create({
-      data: {
-        userId: user!.id,
-        action: "CREATE_SONG",
-        targetType: "Song",
-        targetId: song.id,
-        details: JSON.stringify({ title: song.title, slug: song.slug }),
-      },
-    });
+    // Safe Audit log (do not fail song creation if audit log fails)
+    if (user?.id) {
+      try {
+        await prisma.adminAuditLog.create({
+          data: {
+            userId: user.id,
+            action: "CREATE_SONG",
+            targetType: "Song",
+            targetId: song.id,
+            details: JSON.stringify({ title: song.title, slug: song.slug }),
+          },
+        });
+      } catch (auditErr) {
+        console.warn("Failed to create admin audit log for song:", auditErr);
+      }
+    }
 
     return NextResponse.json({ success: true, song });
   } catch (err: any) {
     console.error("Create song error:", err);
     return NextResponse.json(
-      { message: "خطا در ثبت آهنگ در پایگاه داده." },
+      { message: `خطا در ثبت آهنگ: ${err?.message || "خطای پایگاه داده"}` },
       { status: 500 }
     );
   }
