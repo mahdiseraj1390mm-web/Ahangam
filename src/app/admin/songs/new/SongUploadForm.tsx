@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { upload } from "@vercel/blob/client";
 import {
   Upload,
   Music,
@@ -81,28 +82,42 @@ export function SongUploadForm({ artists, albums, genres }: SongUploadFormProps)
         }
       };
 
-      // Upload file directly to server so it can be streamed across all devices
+      // Upload file directly to cloud storage (bypassing server body size limits)
       try {
         setIsUploadingFile(true);
         setError(null);
-        const formData = new FormData();
-        formData.append("file", file);
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-        const data = await res.json().catch(() => null);
-        if (res.ok && data?.url) {
-          setUrl320(data.url);
+        
+        let fileUrl = "";
+        try {
+          const newBlob = await upload(file.name, file, {
+            access: "public",
+            handleUploadUrl: "/api/upload/client",
+          });
+          fileUrl = newBlob.url;
+        } catch (directErr) {
+          console.warn("Direct blob client upload fallback to api/upload:", directErr);
+          const formData = new FormData();
+          formData.append("file", file);
+          const res = await fetch("/api/upload", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await res.json().catch(() => null);
+          if (res.ok && data?.url) {
+            fileUrl = data.url;
+          } else {
+            throw new Error(data?.message || `خطای سرور (${res.status})`);
+          }
+        }
+
+        if (fileUrl) {
+          setUrl320(fileUrl);
           setSuccess("فایل صوتی با موفقیت در فضای ابری آپلود شد!");
           setTimeout(() => setSuccess(null), 4000);
-        } else {
-          const errMsg = data?.message || `خطای سرور (${res.status} ${res.statusText})`;
-          setError(`خطا در آپلود: ${errMsg}`);
         }
       } catch (uploadErr: any) {
         console.error("Audio upload error:", uploadErr);
-        setError(`خطای آپلود: ${uploadErr?.message || "مشکل در اتصال به سرور"}`);
+        setError(`خطای آپلود: ${uploadErr?.message || "مشکل در آپلود فایل به فضای ابری"}`);
       } finally {
         setIsUploadingFile(false);
       }
@@ -116,20 +131,36 @@ export function SongUploadForm({ artists, albums, genres }: SongUploadFormProps)
       try {
         setIsUploadingCover(true);
         setError(null);
-        const formData = new FormData();
-        formData.append("file", file);
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-        const data = await res.json();
-        if (res.ok && data.url) {
-          setCoverImage(data.url);
-        } else {
-          setError(data.message || "خطا در آپلود کاور تصویر.");
+        
+        let coverUrl = "";
+        try {
+          const newBlob = await upload(file.name, file, {
+            access: "public",
+            handleUploadUrl: "/api/upload/client",
+          });
+          coverUrl = newBlob.url;
+        } catch {
+          const formData = new FormData();
+          formData.append("file", file);
+          const res = await fetch("/api/upload", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await res.json().catch(() => null);
+          if (res.ok && data?.url) {
+            coverUrl = data.url;
+          } else {
+            throw new Error(data?.message || "خطا در آپلود تصویر");
+          }
         }
-      } catch {
-        setError("خطای اتصال به سرور در آپلود تصویر کاور.");
+
+        if (coverUrl) {
+          setCoverImage(coverUrl);
+          setSuccess("کاور با موفقیت آپلود شد!");
+          setTimeout(() => setSuccess(null), 3000);
+        }
+      } catch (err: any) {
+        setError(`خطا در آپلود کاور: ${err?.message || "مشکل در اتصال به سرور"}`);
       } finally {
         setIsUploadingCover(false);
       }

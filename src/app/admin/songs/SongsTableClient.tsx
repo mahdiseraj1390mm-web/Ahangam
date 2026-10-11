@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { upload } from "@vercel/blob/client";
 import {
   Trash2,
   Eye,
@@ -128,17 +129,30 @@ export function SongsTableClient({
         }
       };
 
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const data = await res.json();
-      if (res.ok && data.url) {
-        setEditUrl320(data.url);
-      } else {
-        alert(data.message || "خطا در آپلود فایل صوتی.");
+      let fileUrl = "";
+      try {
+        const newBlob = await upload(file.name, file, {
+          access: "public",
+          handleUploadUrl: "/api/upload/client",
+        });
+        fileUrl = newBlob.url;
+      } catch {
+        const fd = new FormData();
+        fd.append("file", file);
+        const res = await fetch("/api/upload", { method: "POST", body: fd });
+        const data = await res.json().catch(() => null);
+        if (res.ok && data?.url) {
+          fileUrl = data.url;
+        } else {
+          throw new Error(data?.message || "خطا در آپلود فایل صوتی.");
+        }
       }
-    } catch {
-      alert("خطای اتصال در آپلود فایل صوتی.");
+
+      if (fileUrl) {
+        setEditUrl320(fileUrl);
+      }
+    } catch (err: any) {
+      alert(`خطا در آپلود فایل صوتی: ${err?.message || "مشکل در اتصال"}`);
     } finally {
       setIsUploadingAudio(false);
     }
@@ -150,17 +164,30 @@ export function SongsTableClient({
 
     try {
       setIsUploadingCover(true);
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const data = await res.json();
-      if (res.ok && data.url) {
-        setEditCoverImage(data.url);
-      } else {
-        alert(data.message || "خطا در آپلود تصویر کاور.");
+      let coverUrl = "";
+      try {
+        const newBlob = await upload(file.name, file, {
+          access: "public",
+          handleUploadUrl: "/api/upload/client",
+        });
+        coverUrl = newBlob.url;
+      } catch {
+        const fd = new FormData();
+        fd.append("file", file);
+        const res = await fetch("/api/upload", { method: "POST", body: fd });
+        const data = await res.json().catch(() => null);
+        if (res.ok && data?.url) {
+          coverUrl = data.url;
+        } else {
+          throw new Error(data?.message || "خطا در آپلود تصویر کاور.");
+        }
       }
-    } catch {
-      alert("خطای اتصال در آپلود کاور.");
+
+      if (coverUrl) {
+        setEditCoverImage(coverUrl);
+      }
+    } catch (err: any) {
+      alert(`خطا در آپلود کاور: ${err?.message || "مشکل در اتصال"}`);
     } finally {
       setIsUploadingCover(false);
     }
