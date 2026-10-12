@@ -62,11 +62,19 @@ export async function PATCH(req: NextRequest) {
         },
       });
 
-      // 2. Upgrade user role to VIP
+      // 2. Upgrade user role to VIP (unless user is already an ADMIN or SUPER_ADMIN)
+      const targetUser = await prisma.user.findUnique({
+        where: { id: sub.userId },
+        select: { role: true },
+      });
+
       await prisma.user.update({
         where: { id: sub.userId },
         data: {
-          role: "VIP",
+          role:
+            targetUser?.role === "SUPER_ADMIN" || targetUser?.role === "ADMIN"
+              ? targetUser.role
+              : "VIP",
           subscriptionExpiresAt: endsAt,
         },
       });
