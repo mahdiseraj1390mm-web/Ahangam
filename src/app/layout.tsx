@@ -12,7 +12,10 @@ import { PwaRegister } from "@/components/pwa/PwaRegister";
 import { getCurrentUser } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL ||
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://ahangam-b18n.vercel.app")
+  ),
   title: {
     default: "آهنگام | مرجع دانلود آهنگ جدید، متن ترانه و پخش آنلاین موسیقی",
     template: "%s | آهنگام",
