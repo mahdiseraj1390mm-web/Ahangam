@@ -28,7 +28,7 @@ export default async function PlansPage() {
 
   const bankInfo = {
     cardNumber: bankSettings.find((s) => s.key === "BANK_CARD_NUMBER")?.value || "۶۰۳۷-۹۹۷۵-۱۲۳۴-۵۶۷۸",
-    cardHolder: bankSettings.find((s) => s.key === "BANK_CARD_HOLDER")?.value || "مهدی سراج (مدیریت رسانه آهنگام)",
+    cardHolder: bankSettings.find((s) => s.key === "BANK_CARD_HOLDER")?.value || "بیتا",
     bankName: bankSettings.find((s) => s.key === "BANK_NAME")?.value || "بانک ملی ایران",
   };
 

@@ -31,7 +31,7 @@ export async function GET() {
 
     const bankInfo = {
       cardNumber: settings.find((s) => s.key === "BANK_CARD_NUMBER")?.value || "۶۰۳۷-۹۹۷۵-۰۰۰۰-۰۰۰۰",
-      cardHolder: settings.find((s) => s.key === "BANK_CARD_HOLDER")?.value || "مدیریت آهنگام",
+      cardHolder: settings.find((s) => s.key === "BANK_CARD_HOLDER")?.value || "بیتا",
       bankName: settings.find((s) => s.key === "BANK_NAME")?.value || "بانک ملی",
     };
 
