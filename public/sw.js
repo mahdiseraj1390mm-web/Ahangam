@@ -1,45 +1,21 @@
-// Service Worker for Ahangam PWA (Offline Shell & Media Caching)
-const CACHE_NAME = 'ahangam-v1';
-const STATIC_ASSETS = [
-  '/',
-  '/manifest.webmanifest',
-];
-
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
-    })
-  );
+// Service Worker uninstaller to ensure real-time dynamic fresh content on mobile & desktop
+self.addEventListener('install', () => {
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
-      return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
-      );
+      return Promise.all(keys.map((key) => caches.delete(key)));
+    }).then(() => {
+      return self.registration.unregister();
     })
   );
   self.clients.claim();
 });
 
+// Network-only fetch pass-through (never cache old versions)
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
-  
-  // Cache-first strategy for static assets, network-first for pages and APIs
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).catch(() => {
-        // Fallback for navigation requests
-        if (event.request.mode === 'navigate') {
-          return caches.match('/');
-        }
-      });
-    })
-  );
+  // Pass-through to network directly
+  return;
 });

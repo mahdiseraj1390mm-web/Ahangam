@@ -100,6 +100,11 @@ export default async function RootLayout({
 
   return (
     <html lang="fa" dir="rtl" className="dark" suppressHydrationWarning>
+      <head>
+        <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta httpEquiv="Pragma" content="no-cache" />
+        <meta httpEquiv="Expires" content="0" />
+      </head>
       <body className="min-h-screen flex flex-col bg-surface-bg text-content-primary selection:bg-brand selection:text-white" suppressHydrationWarning>
         <ThemeProvider>
           <PlayerProvider>

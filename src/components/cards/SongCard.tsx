@@ -56,6 +56,9 @@ export function SongCard({ song, queueContext, variant = "standard" }: SongCardP
                 src={song.coverImage}
                 alt={song.title}
                 className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = "/logo.png";
+                }}
               />
             ) : (
               <div className="w-full h-full bg-brand/10 flex items-center justify-center text-brand font-bold text-xs">
@@ -148,6 +151,9 @@ export function SongCard({ song, queueContext, variant = "standard" }: SongCardP
             alt={song.title}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = "/logo.png";
+            }}
           />
         ) : (
           <div className="w-full h-full bg-brand/10 flex items-center justify-center text-brand font-bold">

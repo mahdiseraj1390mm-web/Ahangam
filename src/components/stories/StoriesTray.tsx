@@ -27,6 +27,9 @@ export function StoriesTray({ stories }: { stories: StoryItem[] }) {
                     src={story.mediaUrl}
                     alt={story.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = "/logo.png";
+                    }}
                   />
                 </div>
               </div>
