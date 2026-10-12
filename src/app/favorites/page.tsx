@@ -9,15 +9,7 @@ export const dynamic = "force-dynamic";
 
 export default async function FavoritesPage() {
   const user = await getCurrentUser();
-  let userId = user?.id;
-
-  if (!userId) {
-    const guest = await prisma.user.findFirst({
-      where: { phone: "09999999999" },
-      select: { id: true },
-    });
-    userId = guest?.id;
-  }
+  const userId = user?.id;
 
   let favoriteSongs: SongItem[] = [];
   let userPlaylists: any[] = [];

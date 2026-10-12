@@ -346,10 +346,13 @@ model UserSubscription {
   plan           SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
   startsAt       DateTime         @default(now())
   endsAt         DateTime
-  status         String           @default("ACTIVE") // "ACTIVE" | "EXPIRED" | "CANCELLED"
-  transactionRef String?
+  status         String           @default("PENDING") // "PENDING" | "ACTIVE" | "REJECTED" | "EXPIRED" | "CANCELLED"
+  receiptImage   String?          // URL to payment receipt uploaded to blob
+  rejectReason   String?          // Reason provided by admin when rejected
+  transactionRef String?          // Tracking code or card reference
   amountPaid     Int              @default(0)
   createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @default(now()) @updatedAt
 }
 
 model SiteSetting {

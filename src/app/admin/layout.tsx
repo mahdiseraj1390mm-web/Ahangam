@@ -20,7 +20,11 @@ import {
   AlertTriangle,
   Film,
   Flame,
+  CreditCard,
 } from "lucide-react";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function AdminLayout({
   children,
@@ -46,6 +50,7 @@ export default async function AdminLayout({
     { label: "استوری‌ها", href: "/admin/stories", icon: Sparkles },
     { label: "چیدمان صفحه اصلی", href: "/admin/home-sections", icon: Layers },
     { label: "کاربران و زیرادمین‌ها", href: "/admin/users", icon: Users },
+    { label: "فیش‌های واریزی و اشتراک‌ها", href: "/admin/subscriptions", icon: CreditCard, highlight: true },
     { label: "نظرات کاربران", href: "/admin/comments", icon: MessageSquare },
     { label: "تیکت‌های پشتیبانی", href: "/admin/tickets", icon: MessageSquare },
     { label: "گزارش‌های تخلف", href: "/admin/reports", icon: AlertTriangle },

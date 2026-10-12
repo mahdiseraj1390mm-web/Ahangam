@@ -31,8 +31,17 @@ export default function LoginPage() {
         return;
       }
 
-      // Immediate full navigation so cookies are instantly sent and server layout recognizes user
-      window.location.href = "/";
+      // Redirect admin directly to admin panel, or redirect query param, or home
+      const searchParams = new URLSearchParams(window.location.search);
+      const redirectUrl = searchParams.get("redirect");
+
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+      } else if (data?.user?.role === "ADMIN" || data?.user?.role === "SUPER_ADMIN") {
+        window.location.href = "/admin";
+      } else {
+        window.location.href = "/";
+      }
     } catch {
       setError("خطای اتصال به سرور. لطفاً مجدداً تلاش کنید.");
       setLoading(false);

@@ -29,13 +29,18 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const userId = await getActiveUserId();
+    const user = await getCurrentUser();
+    if (!user) {
+      // Guest toggling: succeed gracefully without modifying DB
+      return NextResponse.json({ success: true, isGuest: true });
+    }
+
     const { id: songId } = await params;
 
     const existing = await prisma.favorite.findUnique({
       where: {
         userId_songId: {
-          userId,
+          userId: user.id,
           songId,
         },
       },
@@ -49,7 +54,7 @@ export async function POST(
     } else {
       await prisma.favorite.create({
         data: {
-          userId,
+          userId: user.id,
           songId,
         },
       });
