@@ -5,6 +5,7 @@ import { SongDetailClient } from "./SongDetailClient";
 import { SongItem, CommentItem } from "@/types";
 import { getCurrentUser } from "@/lib/auth";
 import { MusicSchema } from "@/components/seo/MusicSchema";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 
 import { Metadata } from "next";
 import { getSiteUrl } from "@/lib/siteUrl";
@@ -157,6 +158,16 @@ export default async function SongPage({ params }: SongPageProps) {
         song={song}
         averageRating={avgRating}
         totalRatings={totalRatings}
+      />
+      <Breadcrumbs
+        items={[
+          { label: "آهنگ‌ها", href: "/songs" },
+          {
+            label: song.artist?.name || "بیتا",
+            href: `/artist/${song.artist?.slug || "bita"}`,
+          },
+          { label: song.title },
+        ]}
       />
       <SongDetailClient
         song={song}

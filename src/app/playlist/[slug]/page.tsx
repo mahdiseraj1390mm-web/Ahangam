@@ -5,9 +5,70 @@ import { SongCard } from "@/components/cards/SongCard";
 import { SongItem } from "@/types";
 import { ListMusic, User, Music } from "lucide-react";
 import { toPersianDigits } from "@/lib/utils";
+import { Metadata } from "next";
+import { getSiteUrl } from "@/lib/siteUrl";
+import { PlaylistSchema } from "@/components/seo/PlaylistSchema";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 
 interface PlaylistPageProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: PlaylistPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const baseUrl = getSiteUrl();
+
+  const playlist = await prisma.playlist.findFirst({
+    where: {
+      OR: [{ slug: slug }, { id: slug }],
+    },
+    include: {
+      user: { select: { displayName: true } },
+    },
+  });
+
+  if (!playlist) {
+    return {
+      title: "پلی‌لیست یافت نشد | آهنگام",
+    };
+  }
+
+  const creatorName = playlist.user?.displayName || "سردبیر آهنگام";
+  const pageTitle = `پلی‌لیست ${playlist.title} (گلچین آهنگ‌ها) | آهنگام`;
+  const pageDescription =
+    playlist.description ||
+    `شنیدن و دانلود آهنگ‌های پلی‌لیست ${playlist.title} گردآوری شده توسط ${creatorName} به صورت آنلاین در آهنگام.`;
+  const canonicalUrl = `${baseUrl}/playlist/${playlist.slug}`;
+
+  return {
+    title: pageTitle,
+    description: pageDescription,
+    keywords: [
+      `پلی لیست ${playlist.title}`,
+      `آهنگ های ${playlist.title}`,
+      "پلی لیست آهنگ",
+      "آهنگام",
+      "پخش آنلاین موسیقی",
+    ],
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title: pageTitle,
+      description: pageDescription,
+      url: canonicalUrl,
+      siteName: "آهنگام",
+      locale: "fa_IR",
+      images: playlist.coverImage
+        ? [
+            {
+              url: playlist.coverImage,
+              alt: `کاور پلی‌لیست ${playlist.title}`,
+            },
+          ]
+        : [],
+    },
+  };
 }
 
 export default async function PlaylistDetailPage({ params }: PlaylistPageProps) {
@@ -38,6 +99,14 @@ export default async function PlaylistDetailPage({ params }: PlaylistPageProps) 
 
   return (
     <div className="space-y-8 py-4">
+      <PlaylistSchema playlist={playlist} songs={songs} />
+      <Breadcrumbs
+        items={[
+          { label: "پلی‌لیست‌ها", href: "/playlists" },
+          { label: playlist.title },
+        ]}
+      />
+
       {/* Playlist Hero */}
       <div className="flex flex-col sm:flex-row items-center gap-6 p-6 sm:p-8 rounded-3xl bg-surface-card border border-surface-border shadow-xl">
         <div className="relative w-40 h-40 rounded-2xl overflow-hidden shadow-2xl shrink-0 bg-surface-100 flex items-center justify-center text-brand">

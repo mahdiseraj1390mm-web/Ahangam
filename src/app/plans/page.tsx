@@ -3,6 +3,26 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { PlansClient } from "./PlansClient";
 
+import { Metadata } from "next";
+import { getSiteUrl } from "@/lib/siteUrl";
+
+export const metadata: Metadata = {
+  title: "خرید اشتراک VIP | دسترسی نامحدود به بالاترین کیفیت دانلود",
+  description:
+    "تهیه اشتراک ویژه آهنگام جهت دانلود با کیفیت‌های ۳۲۰ و FLAC بدون تبلیغات و با سرعت نامحدود.",
+  keywords: ["خرید اشتراک آهنگام", "اشتراک VIP موسیقی", "دانلود بی نهایت", "آهنگام"],
+  alternates: {
+    canonical: `${getSiteUrl()}/plans`,
+  },
+  openGraph: {
+    title: "خرید اشتراک VIP | رسانه آهنگام",
+    description: "دانلود بدون محدودیت با بالاترین کیفیت در رسانه آهنگام.",
+    url: `${getSiteUrl()}/plans`,
+    siteName: "آهنگام",
+    locale: "fa_IR",
+  },
+};
+
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
 

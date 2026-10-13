@@ -2,8 +2,34 @@ import React from "react";
 import { prisma } from "@/lib/prisma";
 import { ArtistCard } from "@/components/cards/ArtistCard";
 import { ArtistItem } from "@/types";
+import { Metadata } from "next";
+import { getSiteUrl } from "@/lib/siteUrl";
 
 export const revalidate = 0;
+
+export const metadata: Metadata = {
+  title: "هنرمندان و خوانندگان | بیوگرافی و فول آلبوم کامل",
+  description:
+    "فهرست کامل خوانندگان و هنرمندان محبوب در رسانه موسیقی آهنگام به همراه بیوگرافی، دانلود تمام آثار و پلی‌لیست‌های اختصاصی.",
+  keywords: [
+    "خوانندگان",
+    "هنرمندان موسیقی",
+    "فول آلبوم خوانندگان",
+    "بیتا",
+    "آهنگام",
+    "دانلود آهنگ های خوانندگان",
+  ],
+  alternates: {
+    canonical: `${getSiteUrl()}/artists`,
+  },
+  openGraph: {
+    title: "هنرمندان آهنگام | آرشیو کامل خوانندگان",
+    description: "فهرست کامل و اختصاصی خوانندگان و هنرمندان در رسانه آهنگام.",
+    url: `${getSiteUrl()}/artists`,
+    siteName: "آهنگام",
+    locale: "fa_IR",
+  },
+};
 
 export default async function ArtistsDirectoryPage() {
   const artistsRaw = await prisma.artist.findMany({

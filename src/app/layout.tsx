@@ -99,9 +99,7 @@ export default async function RootLayout({
 }>) {
   const user = await getCurrentUser();
 
-  const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://ahangam-b18n.vercel.app");
+  const baseUrl = getSiteUrl();
 
   const organizationSchema = {
     "@context": "https://schema.org",

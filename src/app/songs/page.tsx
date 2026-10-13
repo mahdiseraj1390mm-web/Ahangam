@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { SongsArchiveClient } from "./SongsArchiveClient";
 import { SongItem } from "@/types";
 
+import { getSiteUrl } from "@/lib/siteUrl";
+
 export const metadata: Metadata = {
   title: "دانلود تمام آهنگ‌ها | آرشیو آهنگ‌های جدید و قدیمی با متن ترانه",
   description:
@@ -18,6 +20,16 @@ export const metadata: Metadata = {
     "بیتا",
     "پخش آنلاین موسیقی",
   ],
+  alternates: {
+    canonical: `${getSiteUrl()}/songs`,
+  },
+  openGraph: {
+    title: "دانلود تمام آهنگ‌ها | آرشیو رسانه آهنگام",
+    description: "آرشیو کامل آهنگ‌ها، دانلود کیفیت 320 و 128 و پخش آنلاین در رسانه آهنگام.",
+    url: `${getSiteUrl()}/songs`,
+    siteName: "آهنگام",
+    locale: "fa_IR",
+  },
 };
 
 export const revalidate = 0;

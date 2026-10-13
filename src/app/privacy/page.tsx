@@ -1,6 +1,17 @@
 import React from "react";
 import { Lock, Shield, EyeOff } from "lucide-react";
 
+import { Metadata } from "next";
+import { getSiteUrl } from "@/lib/siteUrl";
+
+export const metadata: Metadata = {
+  title: "حریم خصوصی کاربران | آهنگام",
+  description: "سیاست حفظ حریم خصوصی، امنیت داده‌ها و عدم افشای شماره‌های تماس در رسانه آهنگام.",
+  alternates: {
+    canonical: `${getSiteUrl()}/privacy`,
+  },
+};
+
 export default function PrivacyPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-8 py-8">

@@ -3,8 +3,34 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ListMusic, Music } from "lucide-react";
 import { toPersianDigits } from "@/lib/utils";
+import { Metadata } from "next";
+import { getSiteUrl } from "@/lib/siteUrl";
 
 export const revalidate = 0;
+
+export const metadata: Metadata = {
+  title: "پلی‌لیست‌های برگزیده | گلچین بهترین آهنگ‌ها",
+  description:
+    "مجموعه برترین و پرطرفدارترین پلی‌لیست‌های موسیقی برای موقعیت‌های مختلف از جمله رانندگی، مهمانی، آرامش و ورزش در رسانه آهنگام.",
+  keywords: [
+    "پلی لیست آهنگ",
+    "گلچین آهنگ",
+    "پلی لیست رانندگی",
+    "پلی لیست شاد",
+    "آهنگام",
+    "پخش آنلاین پلی لیست",
+  ],
+  alternates: {
+    canonical: `${getSiteUrl()}/playlists`,
+  },
+  openGraph: {
+    title: "پلی‌لیست‌های برگزیده | آهنگام",
+    description: "مجموعه برترین پلی‌لیست‌های اختصاصی و منتخب کاربران در رسانه آهنگام.",
+    url: `${getSiteUrl()}/playlists`,
+    siteName: "آهنگام",
+    locale: "fa_IR",
+  },
+};
 
 export default async function PlaylistsArchivePage() {
   const playlists = await prisma.playlist.findMany({

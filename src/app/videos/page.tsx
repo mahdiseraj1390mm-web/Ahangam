@@ -3,8 +3,35 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Film, Play, Eye } from "lucide-react";
 import { formatNumberPersian, formatDuration } from "@/lib/utils";
+import { Metadata } from "next";
+import { getSiteUrl } from "@/lib/siteUrl";
 
 export const revalidate = 0;
+
+export const metadata: Metadata = {
+  title: "موزیک ویدیوها | تماشا و دانلود جدیدترین نماهنگ‌ها",
+  description:
+    "آرشیو نماهنگ‌ها و موزیک ویدیوهای باکیفیت هنرمندان ایران با کیفیت HD و Full HD به همراه پخش آنلاین در رسانه آهنگام.",
+  keywords: [
+    "موزیک ویدیو",
+    "دانلود موزیک ویدیو",
+    "نماهنگ",
+    "کلیپ تصویری",
+    "آهنگام",
+    "بیتا",
+    "ویدیو کلیپ جدید",
+  ],
+  alternates: {
+    canonical: `${getSiteUrl()}/videos`,
+  },
+  openGraph: {
+    title: "موزیک ویدیوها | رسانه آهنگام",
+    description: "تماشا و دانلود جدیدترین نماهنگ‌ها و موزیک‌ویدیوهای رسمی در آهنگام.",
+    url: `${getSiteUrl()}/videos`,
+    siteName: "آهنگام",
+    locale: "fa_IR",
+  },
+};
 
 export default async function VideosArchivePage() {
   const videos = await prisma.musicVideo.findMany({
@@ -26,9 +53,10 @@ export default async function VideosArchivePage() {
       {videos.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {videos.map((vid) => (
-            <div
+            <Link
               key={vid.id}
-              className="group rounded-3xl bg-surface-card border border-surface-border overflow-hidden shadow-lg hover:shadow-2xl transition-all space-y-3 p-3"
+              href={`/video/${vid.slug}`}
+              className="group rounded-3xl bg-surface-card border border-surface-border overflow-hidden shadow-lg hover:shadow-2xl transition-all space-y-3 p-3 block"
             >
               <div className="aspect-video w-full rounded-2xl overflow-hidden bg-surface-100 relative shadow-inner">
                 {vid.coverImage ? (
@@ -66,7 +94,7 @@ export default async function VideosArchivePage() {
                   <span>{formatNumberPersian(vid.viewsCount)} بازدید</span>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       ) : (

@@ -1,6 +1,17 @@
 import React from "react";
 import { ShieldCheck, FileText, Scale } from "lucide-react";
 
+import { Metadata } from "next";
+import { getSiteUrl } from "@/lib/siteUrl";
+
+export const metadata: Metadata = {
+  title: "قوانین و مقررات | آهنگام",
+  description: "ضوابط انتشار آثار، کپی‌رایت، حقوق ناشران و شرایط عضویت در رسانه آهنگام.",
+  alternates: {
+    canonical: `${getSiteUrl()}/rules`,
+  },
+};
+
 export default function RulesPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-8 py-8">

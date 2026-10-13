@@ -4,6 +4,16 @@ import { prisma } from "@/lib/prisma";
 import { FavoritesClient } from "./FavoritesClient";
 import { SongItem } from "@/types";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "علاقه‌مندی‌های من | آهنگام",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
 

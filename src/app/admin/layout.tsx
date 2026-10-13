@@ -21,7 +21,17 @@ import {
   Film,
   Flame,
   CreditCard,
+  Globe,
 } from "lucide-react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "پنل مدیریت | آهنگام",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -40,6 +50,7 @@ export default async function AdminLayout({
   const navItems = [
     { label: "داشبورد و آمار", href: "/admin", icon: LayoutDashboard },
     { label: "مدیریت آهنگ‌ها", href: "/admin/songs", icon: Music },
+    { label: "مرکز کنترل و سئو", href: "/admin/seo", icon: Globe },
     { label: "مدیریت سبک‌ها و دسته‌بندی‌ها", href: "/admin/genres", icon: Layers },
     { label: "افزودن آهنگ جدید", href: "/admin/songs/new", icon: PlusCircle, highlight: true },
     { label: "پیشنهاد ویژه روز (بنر اصلی)", href: "/admin/featured-song", icon: Sparkles },

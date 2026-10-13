@@ -7,6 +7,8 @@ import { getCurrentUser } from "@/lib/auth";
 
 import { Metadata } from "next";
 import { getSiteUrl } from "@/lib/siteUrl";
+import { ArtistSchema } from "@/components/seo/ArtistSchema";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 
 interface ArtistPageProps {
   params: Promise<{ slug: string }>;
@@ -107,8 +109,16 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
   const songs = artistRaw.songs as unknown as SongItem[];
   const albums = artistRaw.albums as unknown as AlbumItem[];
 
+
   return (
     <div className="py-4">
+      <ArtistSchema artist={artist} songs={songs} />
+      <Breadcrumbs
+        items={[
+          { label: "هنرمندان", href: "/artists" },
+          { label: artist.name },
+        ]}
+      />
       <ArtistDetailClient
         artist={artist}
         songs={songs}
