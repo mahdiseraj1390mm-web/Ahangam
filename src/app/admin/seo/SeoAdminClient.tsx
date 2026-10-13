@@ -267,16 +267,35 @@ export function SeoAdminClient() {
         <div className="bg-surface-card border border-surface-border rounded-2xl p-5 shadow-sm space-y-3">
           <div className="flex items-center justify-between text-xs text-content-muted">
             <span className="font-semibold">وضعیت Google Search Console</span>
-            <AlertTriangle className="w-4 h-4 text-amber-500" />
+            {settings["GSC_STATUS"] === "VERIFIED" ? (
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            ) : (
+              <AlertTriangle className="w-4 h-4 text-amber-500" />
+            )}
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-xs font-bold text-amber-400 flex items-center gap-1">
-              نیازمند تأیید نهایی مالک
+            <span
+              className={`text-xs font-bold flex items-center gap-1 ${
+                settings["GSC_STATUS"] === "VERIFIED" ? "text-emerald-400" : "text-amber-400"
+              }`}
+            >
+              {settings["GSC_STATUS"] === "VERIFIED" ? "متصل و تأییدشده در گوگل" : "نیازمند تأیید نهایی مالک"}
             </span>
           </div>
           <p className="text-[11px] text-content-muted leading-tight">
-            فایل HTML و متاتگ در سایت مستقر هستند؛ اتصال نهایی مشروط به کلیک دکمه Verify در حساب کاربری شماست.
+            {settings["GSC_STATUS"] === "VERIFIED"
+              ? "مالکیت سایت در کنسول گوگل با موفقیت تأیید شد و نقشه سایت (sitemap.xml) فعال است."
+              : "فایل HTML و متاتگ در سایت مستقر هستند؛ اتصال نهایی مشروط به کلیک دکمه Verify در حساب کاربری شماست."}
           </p>
+          <a
+            href="https://search.google.com/search-console"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-[11px] text-brand hover:underline pt-1"
+          >
+            <span>ورود به Search Console</span>
+            <ExternalLink className="w-3 h-3" />
+          </a>
         </div>
       </div>
 

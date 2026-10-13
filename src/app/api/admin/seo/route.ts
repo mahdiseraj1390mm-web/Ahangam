@@ -69,6 +69,7 @@ export async function GET() {
               "SITE_TAGLINE",
               "GOOGLE_VERIFICATION_CODE",
               "DEFAULT_ARTIST_NAME",
+              "GSC_STATUS",
             ],
           },
         },
@@ -128,7 +129,12 @@ export async function GET() {
         technical: { score: techScore, max: 40, status: "PASSED" },
         content: { score: contentScore, max: 40, status: contentScore >= 30 ? "PASSED" : "NEEDS_IMPROVEMENT" },
         structure: { score: structureScore, max: 20, status: structureScore >= 15 ? "PASSED" : "DUPLICATES_DETECTED" },
-        externalSearchConsole: { status: "PENDING_OWNER_VERIFICATION", note: "تگ و فایل HTML در هاست مستقر هستند؛ تأیید نهایی باید در پنل Search Console انجام شود." },
+        externalSearchConsole: {
+          status: siteSettings.find((s) => s.key === "GSC_STATUS")?.value === "VERIFIED" ? "VERIFIED" : "PENDING_OWNER_VERIFICATION",
+          note: siteSettings.find((s) => s.key === "GSC_STATUS")?.value === "VERIFIED"
+            ? "مالکیت سایت در Google Search Console با موفقیت تأیید شد و نقشه سایت با وضعیت Success فعال است."
+            : "تگ و فایل HTML در هاست مستقر هستند؛ تأیید نهایی باید در پنل Search Console انجام شود.",
+        },
       },
       stats: {
         totalSongs,
