@@ -118,11 +118,23 @@ export function ArtistDetailClient({
           </h2>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {songs.map((song) => (
-            <SongCard key={song.id} song={song} queueContext={songs} />
-          ))}
-        </div>
+        {songs.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {songs.map((song) => (
+              <SongCard key={song.id} song={song} queueContext={songs} />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-border-default/50 bg-surface-card/60 p-8 text-center backdrop-blur-sm">
+            <Music className="w-10 h-10 text-content-tertiary mx-auto mb-3 opacity-40" />
+            <p className="text-content-secondary font-medium text-sm">
+              هنوز قطعه‌ای برای این هنرمند در رسانه آهنگام منتشر نشده است.
+            </p>
+            <p className="text-content-tertiary text-xs mt-1">
+              به‌محض انتشار قطعه جدید، در این صفحه قرار خواهد گرفت.
+            </p>
+          </div>
+        )}
       </section>
 
       {/* Albums Section */}

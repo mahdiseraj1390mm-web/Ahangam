@@ -30,6 +30,10 @@ export async function generateMetadata({ params }: ArtistPageProps): Promise<Met
     };
   }
 
+  const songsCount = await prisma.song.count({
+    where: { artistId: artist.id, status: "PUBLISHED" },
+  });
+
   const name = artist.name;
   const pageTitle = `دانلود تمام آهنگ های ${name} جدید و قدیمی با متن ترانه`;
   const pageDescription = `فول آلبوم و دانلود تمام آهنگ‌های ${name} به همراه پخش آنلاین، متن آهنگ‌ها، آلبوم‌ها و موزیک ویدیوها در رسانه موسیقی آهنگام.`;
@@ -37,6 +41,7 @@ export async function generateMetadata({ params }: ArtistPageProps): Promise<Met
   return {
     title: pageTitle,
     description: pageDescription,
+    robots: songsCount === 0 ? { index: false, follow: true } : { index: true, follow: true },
     keywords: [
       `آهنگ های ${name}`,
       `دانلود آهنگ های ${name}`,
@@ -44,7 +49,6 @@ export async function generateMetadata({ params }: ArtistPageProps): Promise<Met
       `آهنگ جدید ${name}`,
       `بیوگرافی ${name}`,
       "آهنگام",
-      "بیتا",
       "آهنگ",
       "دانلود آهنگ جدید",
     ],

@@ -4,6 +4,11 @@ import { checkAdminPermission } from "@/lib/auth";
 
 export async function GET() {
   try {
+    const { authorized } = await checkAdminPermission();
+    if (!authorized) {
+      return NextResponse.json({ message: "دسترسی غیرمجاز." }, { status: 403 });
+    }
+
     const albums = await prisma.album.findMany({
       include: {
         artist: true,

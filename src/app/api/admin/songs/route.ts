@@ -134,6 +134,11 @@ export async function POST(req: NextRequest) {
 
 export async function GET() {
   try {
+    const { authorized } = await checkAdminPermission("SONGS_MANAGE");
+    if (!authorized) {
+      return NextResponse.json({ message: "دسترسی غیرمجاز." }, { status: 403 });
+    }
+
     const songs = await prisma.song.findMany({
       include: { artist: true, album: true, qualities: true },
       orderBy: { createdAt: "desc" },

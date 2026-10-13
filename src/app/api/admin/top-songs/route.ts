@@ -6,6 +6,11 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
+    const { authorized } = await checkAdminPermission();
+    if (!authorized) {
+      return NextResponse.json({ message: "دسترسی غیرمجاز." }, { status: 403 });
+    }
+
     const setting = await prisma.siteSetting.findUnique({
       where: { key: "TOP_SONGS_CONFIG" },
     });

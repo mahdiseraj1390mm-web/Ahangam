@@ -26,6 +26,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         take: 2000,
       }),
       prisma.artist.findMany({
+        where: {
+          songs: {
+            some: { status: "PUBLISHED" },
+          },
+        },
         select: { slug: true, updatedAt: true },
         take: 500,
       }),
