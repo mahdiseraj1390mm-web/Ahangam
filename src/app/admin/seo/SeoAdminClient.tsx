@@ -266,17 +266,16 @@ export function SeoAdminClient() {
         {/* Google Verification Status */}
         <div className="bg-surface-card border border-surface-border rounded-2xl p-5 shadow-sm space-y-3">
           <div className="flex items-center justify-between text-xs text-content-muted">
-            <span className="font-semibold">تأییدیه Google Search Console</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+            <span className="font-semibold">وضعیت Google Search Console</span>
+            <AlertTriangle className="w-4 h-4 text-amber-500" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-sm font-bold text-emerald-500 flex items-center gap-1">
-              <Check className="w-4 h-4" />
-              تگ متصل در کد قالب
+            <span className="text-xs font-bold text-amber-400 flex items-center gap-1">
+              نیازمند تأیید نهایی مالک
             </span>
           </div>
-          <p className="text-[10px] text-content-muted font-mono truncate" title="40WYMf4U5Bs8qH3ASIY69XDeGe2uNqOFPy3cqmLX6Tc">
-            کد: 40WYMf4U5Bs...LX6Tc
+          <p className="text-[11px] text-content-muted leading-tight">
+            فایل HTML و متاتگ در سایت مستقر هستند؛ اتصال نهایی مشروط به کلیک دکمه Verify در حساب کاربری شماست.
           </p>
         </div>
       </div>

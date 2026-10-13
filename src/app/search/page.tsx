@@ -6,7 +6,7 @@ import { SongItem, ArtistItem, AlbumItem } from "@/types";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "جستجوی موسیقی و آهنگ‌ها | آهنگام",
+  title: "جستجوی موسیقی و آهنگ‌ها",
   description: "جستجوی سریع در آرشیو قطعات، متن ترانه‌ها و هنرمندان رسانه آهنگام.",
   robots: {
     index: false,

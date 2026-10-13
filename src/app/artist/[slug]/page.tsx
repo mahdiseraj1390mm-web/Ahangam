@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: ArtistPageProps): Promise<Met
   }
 
   const name = artist.name;
-  const pageTitle = `دانلود تمام آهنگ های ${name} جدید و قدیمی با متن ترانه | آهنگام`;
+  const pageTitle = `دانلود تمام آهنگ های ${name} جدید و قدیمی با متن ترانه`;
   const pageDescription = `فول آلبوم و دانلود تمام آهنگ‌های ${name} به همراه پخش آنلاین، متن آهنگ‌ها، آلبوم‌ها و موزیک ویدیوها در رسانه موسیقی آهنگام.`;
 
   return {

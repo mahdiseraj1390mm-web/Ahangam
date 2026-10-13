@@ -5,7 +5,7 @@ import { Metadata } from "next";
 import { getSiteUrl } from "@/lib/siteUrl";
 
 export const metadata: Metadata = {
-  title: "حریم خصوصی کاربران | آهنگام",
+  title: "سیاست حریم خصوصی کاربران",
   description: "سیاست حفظ حریم خصوصی، امنیت داده‌ها و عدم افشای شماره‌های تماس در رسانه آهنگام.",
   alternates: {
     canonical: `${getSiteUrl()}/privacy`,

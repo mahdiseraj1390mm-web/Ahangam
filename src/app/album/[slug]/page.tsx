@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: AlbumPageProps): Promise<Meta
   }
 
   const artistName = album.artist?.name || "بیتا";
-  const pageTitle = `دانلود آلبوم ${album.title} از ${artistName} با کیفیت عالی | آهنگام`;
+  const pageTitle = `دانلود آلبوم ${album.title} از ${artistName} با کیفیت عالی`;
   const pageDescription = `دانلود تمام قطعات آلبوم موسیقی ${album.title} با صدای ${artistName} به همراه پخش آنلاین و اطلاعات کامل آلبوم در رسانه آهنگام.`;
   const canonicalUrl = `${baseUrl}/album/${album.slug}`;
 

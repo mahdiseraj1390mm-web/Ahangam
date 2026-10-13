@@ -5,7 +5,7 @@ import { Metadata } from "next";
 import { getSiteUrl } from "@/lib/siteUrl";
 
 export const metadata: Metadata = {
-  title: "قوانین و مقررات | آهنگام",
+  title: "قوانین و شرایط استفاده",
   description: "ضوابط انتشار آثار، کپی‌رایت، حقوق ناشران و شرایط عضویت در رسانه آهنگام.",
   alternates: {
     canonical: `${getSiteUrl()}/rules`,

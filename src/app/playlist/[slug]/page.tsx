@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PlaylistPageProps): Promise<M
   }
 
   const creatorName = playlist.user?.displayName || "سردبیر آهنگام";
-  const pageTitle = `پلی‌لیست ${playlist.title} (گلچین آهنگ‌ها) | آهنگام`;
+  const pageTitle = `پلی‌لیست ${playlist.title} (گلچین آهنگ‌ها)`;
   const pageDescription =
     playlist.description ||
     `شنیدن و دانلود آهنگ‌های پلی‌لیست ${playlist.title} گردآوری شده توسط ${creatorName} به صورت آنلاین در آهنگام.`;

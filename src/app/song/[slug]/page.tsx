@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: SongPageProps): Promise<Metad
     ? ` | بخشی از متن ترانه: "${song.lyrics.slice(0, 120).replace(/\n/g, " ")}..."`
     : "";
 
-  const pageTitle = `دانلود آهنگ ${songTitle} از ${artistName} + متن آهنگ و پخش آنلاین 320 و 128 | آهنگام`;
+  const pageTitle = `دانلود آهنگ ${songTitle} از ${artistName} + متن ترانه و پخش آنلاین 320 و 128`;
   const pageDescription = `دانلود آهنگ جدید ${songTitle} با صدای ${artistName}${albumName} با دو کیفیت 320 و 128 به همراه متن کامل شعر و پخش آنلاین اختصاصی در رسانه آهنگام.${lyricsSnippet}`;
 
   const keywords = [

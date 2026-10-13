@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getSiteUrl } from "@/lib/siteUrl";
 
 export const metadata: Metadata = {
-  title: "تماس با ما و پشتیبانی | آهنگام",
+  title: "تماس با ما و پشتیبانی",
   description: "ارتباط با تیم پشتیبانی رسانه آهنگام، ارسال پیشنهادات، گزارش خرابی قطعات و درخواست‌ها.",
   alternates: {
     canonical: `${getSiteUrl()}/contact`,

@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: VideoPageProps): Promise<Meta
   }
 
   const artistName = video.artist?.name || "بیتا";
-  const pageTitle = `دانلود و تماشای موزیک ویدیو ${video.title} از ${artistName} با کیفیت عالی | آهنگام`;
+  const pageTitle = `دانلود و تماشای موزیک ویدیو ${video.title} از ${artistName} با کیفیت عالی`;
   const pageDescription = `تماشای آنلاین و دانلود موزیک ویدیوی رسمی ${video.title} با صدای ${artistName} با کیفیت بالا در رسانه آهنگام.`;
   const canonicalUrl = `${baseUrl}/video/${video.slug}`;
 
