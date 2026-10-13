@@ -6,6 +6,7 @@ import { ArtistItem, SongItem, AlbumItem } from "@/types";
 import { getCurrentUser } from "@/lib/auth";
 
 import { Metadata } from "next";
+import { getSiteUrl } from "@/lib/siteUrl";
 
 interface ArtistPageProps {
   params: Promise<{ slug: string }>;
@@ -13,7 +14,7 @@ interface ArtistPageProps {
 
 export async function generateMetadata({ params }: ArtistPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const baseUrl = getSiteUrl();
 
   const artist = await prisma.artist.findFirst({
     where: {

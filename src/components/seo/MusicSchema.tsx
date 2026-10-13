@@ -1,5 +1,6 @@
 import React from "react";
 import { SongItem } from "@/types";
+import { getSiteUrl } from "@/lib/siteUrl";
 
 export function MusicSchema({
   song,
@@ -10,7 +11,7 @@ export function MusicSchema({
   averageRating?: number;
   totalRatings?: number;
 }) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const baseUrl = getSiteUrl();
   const songUrl = `${baseUrl}/song/${song.slug}`;
   const artistName = song.artist?.name || "بیتا";
 

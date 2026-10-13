@@ -7,6 +7,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { MusicSchema } from "@/components/seo/MusicSchema";
 
 import { Metadata } from "next";
+import { getSiteUrl } from "@/lib/siteUrl";
 
 interface SongPageProps {
   params: Promise<{ slug: string }>;
@@ -14,7 +15,7 @@ interface SongPageProps {
 
 export async function generateMetadata({ params }: SongPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const baseUrl = getSiteUrl();
 
   const song = await prisma.song.findFirst({
     where: {

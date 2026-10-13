@@ -10,12 +10,10 @@ import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { PwaRegister } from "@/components/pwa/PwaRegister";
 
 import { getCurrentUser } from "@/lib/auth";
+import { getSiteUrl } from "@/lib/siteUrl";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL ||
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://ahangam-b18n.vercel.app")
-  ),
+  metadataBase: new URL(getSiteUrl()),
   title: {
     default: "آهنگام | مرجع دانلود آهنگ جدید، متن ترانه و پخش آنلاین موسیقی",
     template: "%s | آهنگام",
@@ -101,12 +99,54 @@ export default async function RootLayout({
 }>) {
   const user = await getCurrentUser();
 
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://ahangam-b18n.vercel.app");
+
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${baseUrl}/#organization`,
+        name: "آهنگام",
+        alternateName: ["Ahangam", "رسانه موسیقی آهنگام"],
+        url: baseUrl,
+        logo: `${baseUrl}/logo.png`,
+        sameAs: [
+          "https://www.instagram.com/m_e_d_i_s_a16/",
+          "https://t.me/ahangam_official",
+          "https://rubika.ir/ahangam",
+          "https://eitaa.com/ahangam",
+        ],
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${baseUrl}/#website`,
+        url: baseUrl,
+        name: "آهنگام",
+        publisher: {
+          "@id": `${baseUrl}/#organization`,
+        },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: `${baseUrl}/search?q={search_term_string}`,
+          "query-input": "required name=search_term_string",
+        },
+      },
+    ],
+  };
+
   return (
     <html lang="fa" dir="rtl" className="dark" suppressHydrationWarning>
       <head>
         <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
         <meta httpEquiv="Pragma" content="no-cache" />
         <meta httpEquiv="Expires" content="0" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
       </head>
       <body className="min-h-screen flex flex-col bg-surface-bg text-content-primary selection:bg-brand selection:text-white" suppressHydrationWarning>
         <ThemeProvider>
