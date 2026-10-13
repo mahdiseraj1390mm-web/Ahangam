@@ -428,7 +428,7 @@ async function main() {
   await prisma.socialLink.createMany({
     data: [
       { platform: "TELEGRAM", title: "کانال رسمی تلگرام", url: "https://t.me/ahangam_official", sortOrder: 1, isEnabled: true },
-      { platform: "INSTAGRAM", title: "صفحه اینستاگرام", url: "https://instagram.com/ahangam_music", sortOrder: 2, isEnabled: true },
+      { platform: "INSTAGRAM", title: "اینستاگرام @m_e_d_i_s_a16", url: "https://www.instagram.com/m_e_d_i_s_a16/", sortOrder: 2, isEnabled: true },
       { platform: "RUBIKA", title: "کانال روبیکا", url: "https://rubika.ir/ahangam", sortOrder: 3, isEnabled: true },
       { platform: "EITAA", title: "کانال ایتا", url: "https://eitaa.com/ahangam", sortOrder: 4, isEnabled: true },
     ],

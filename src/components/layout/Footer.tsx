@@ -104,18 +104,48 @@ export async function Footer() {
             </p>
             <div className="flex flex-wrap gap-2">
               {socialLinks.length > 0 ? (
-                socialLinks.map((soc) => (
-                  <a
-                    key={soc.id}
-                    href={soc.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-3 py-1.5 rounded-lg bg-surface-100 hover:bg-brand/10 hover:text-brand text-xs font-medium text-content-secondary border border-surface-border transition-colors flex items-center gap-1.5"
-                  >
-                    <Share2 className="w-3.5 h-3.5" />
-                    <span>{soc.title}</span>
-                  </a>
-                ))
+                socialLinks.map((soc) => {
+                  const isInstagram = soc.platform === "INSTAGRAM" || soc.url.includes("instagram.com");
+                  const isTelegram = soc.platform === "TELEGRAM" || soc.url.includes("t.me");
+
+                  return (
+                    <a
+                      key={soc.id}
+                      href={soc.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`px-3 py-1.5 rounded-lg bg-surface-100 text-xs font-medium border border-surface-border transition-all flex items-center gap-1.5 ${
+                        isInstagram
+                          ? "hover:border-pink-500/50 hover:bg-pink-500/10 hover:text-pink-400 text-content-secondary"
+                          : isTelegram
+                          ? "hover:border-sky-500/50 hover:bg-sky-500/10 hover:text-sky-400 text-content-secondary"
+                          : "hover:bg-brand/10 hover:text-brand text-content-secondary"
+                      }`}
+                      title={soc.title}
+                    >
+                      {isInstagram ? (
+                        <svg
+                          className="w-3.5 h-3.5 text-pink-500 shrink-0"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                          <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+                        </svg>
+                      ) : isTelegram ? (
+                        <Send className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                      ) : (
+                        <Share2 className="w-3.5 h-3.5 shrink-0" />
+                      )}
+                      <span>{soc.title}</span>
+                    </a>
+                  );
+                })
               ) : (
                 <span className="text-xs text-content-muted">کانال‌های رسمی به زودی اعلام خواهد شد.</span>
               )}

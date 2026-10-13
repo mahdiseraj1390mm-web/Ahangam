@@ -15,9 +15,12 @@ export function getSiteUrl(): string {
     return process.env.NEXT_PUBLIC_APP_URL.replace(/\/+$/, "");
   }
 
-  // Production default domain
+  // Production default domain: Use current live active domain (can be overridden anytime via NEXT_PUBLIC_SITE_URL)
   if (process.env.NODE_ENV === "production" || process.env.VERCEL) {
-    return "https://ahangam.ir";
+    if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+      return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+    }
+    return "https://ahangam-b18n.vercel.app";
   }
 
   return "http://localhost:3000";
