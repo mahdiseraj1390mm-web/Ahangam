@@ -88,7 +88,11 @@ export const metadata: Metadata = {
     apple: "/logo.png",
   },
   verification: {
-    google: "40WYMf4U5Bs8qH3ASIY69XDeGe2uNqOFPy3cqmLX6Tc",
+    google: [
+      "40WYMf4U5Bs8qH3ASIY69XDeGe2uNqOFPy3cqmLX6Tc",
+      "google8868cce370e3d2ba",
+      "8868cce370e3d2ba",
+    ],
   },
 };
 
