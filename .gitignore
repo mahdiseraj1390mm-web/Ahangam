@@ -36,4 +36,5 @@ next-env.d.ts
 # database backups & local migration scripts
 backup_db_state.json
 /scripts/
+/public/new/
 
