@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
         artistId: finalArtistId,
         albumId: albumId || null,
         duration: Number(duration) || 0,
-        coverImage,
+        coverImage: coverImage && coverImage.trim() !== "" ? coverImage.trim() : "/logo.png",
         lyrics,
         syncedLyrics,
         lyricist,

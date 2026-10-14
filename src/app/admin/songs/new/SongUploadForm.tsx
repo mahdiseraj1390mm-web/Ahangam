@@ -41,7 +41,7 @@ export function SongUploadForm({ artists, albums, genres }: SongUploadFormProps)
   const [albumId, setAlbumId] = useState("");
   const [selectedGenreIds, setSelectedGenreIds] = useState<string[]>([]);
   const [duration, setDuration] = useState<number>(180);
-  const [coverImage, setCoverImage] = useState("");
+  const [coverImage, setCoverImage] = useState("/logo.png");
   const [lyrics, setLyrics] = useState("");
   const [syncedLyrics, setSyncedLyrics] = useState("");
   const [lyricist, setLyricist] = useState("");
@@ -528,9 +528,18 @@ export function SongUploadForm({ artists, albums, genres }: SongUploadFormProps)
                       className="w-16 h-16 rounded-xl object-cover border border-surface-border shadow-sm shrink-0"
                     />
                     <div className="flex-1 min-w-0 space-y-1">
-                      <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-500">
-                        <Check className="w-3.5 h-3.5" />
-                        <span>کاور فعال آهنگ (در دانلود کاربران نیز داخل فایل تعبیه می‌شود)</span>
+                      <div className="flex items-center gap-1.5 text-xs font-bold">
+                        {coverImage === "/logo.png" ? (
+                          <span className="text-amber-400 flex items-center gap-1">
+                            <Sparkles className="w-3.5 h-3.5" />
+                            کاور پیش‌فرض رسانه آهنگام (در صورت تمایل از دکمه بالا عکس اختصاصی آپلود کنید)
+                          </span>
+                        ) : (
+                          <span className="text-emerald-400 flex items-center gap-1">
+                            <Check className="w-3.5 h-3.5" />
+                            کاور اختصاصی آهنگ (در دانلود کاربران نیز داخل فایل تعبیه می‌شود)
+                          </span>
+                        )}
                       </div>
                       <input
                         type="text"
@@ -540,14 +549,16 @@ export function SongUploadForm({ artists, albums, genres }: SongUploadFormProps)
                         className="w-full p-2 rounded-lg bg-surface-card border border-surface-border text-[11px] text-content-primary focus:outline-none focus:border-brand font-mono"
                       />
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => setCoverImage("")}
-                      className="text-xs text-red-400 hover:text-red-300 px-2 py-1 transition-colors cursor-pointer"
-                      title="حذف کاور"
-                    >
-                      حذف
-                    </button>
+                    {coverImage !== "/logo.png" && (
+                      <button
+                        type="button"
+                        onClick={() => setCoverImage("/logo.png")}
+                        className="text-xs text-amber-400 hover:text-amber-300 px-2 py-1 transition-colors cursor-pointer shrink-0"
+                        title="بازگردانی به کاور پیش‌فرض"
+                      >
+                        کاور پیش‌فرض
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <div className="p-4 rounded-2xl bg-surface-50/50 border border-dashed border-surface-border text-center space-y-1">

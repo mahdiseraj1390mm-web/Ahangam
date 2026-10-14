@@ -5,6 +5,7 @@ import path from "path";
 // @ts-ignore
 import NodeID3 from "node-id3";
 import sharp from "sharp";
+import { getSiteUrl } from "@/lib/siteUrl";
 
 export async function GET(
   req: NextRequest,
@@ -98,7 +99,7 @@ export async function GET(
         if (!imageBuffer) {
           let coverFetchUrl = coverSource;
           if (coverSource.startsWith("/")) {
-            coverFetchUrl = `${req.nextUrl.origin}${coverSource}`;
+            coverFetchUrl = `${getSiteUrl()}${coverSource}`;
           }
           const coverResp = await fetch(coverFetchUrl);
           if (coverResp.ok) {
@@ -124,21 +125,29 @@ export async function GET(
       }
     }
 
-    // Ensure fallback to logo.png if image buffer still missing
+    // Ensure fallback to site logo if image buffer still missing
     if (!imageBuffer) {
-      const defaultLogoPath = path.join(process.cwd(), "public", "logo.png");
-      if (fs.existsSync(defaultLogoPath)) {
-        try {
-          const rawLogo = fs.readFileSync(defaultLogoPath);
+      try {
+        const defaultLogoPath = path.join(process.cwd(), "public", "logo.png");
+        let rawLogo: Buffer | null = null;
+        if (fs.existsSync(defaultLogoPath)) {
+          rawLogo = fs.readFileSync(defaultLogoPath);
+        } else {
+          const logoResp = await fetch(`${getSiteUrl()}/logo.png`);
+          if (logoResp.ok) {
+            rawLogo = Buffer.from(await logoResp.arrayBuffer());
+          }
+        }
+
+        if (rawLogo) {
           imageBuffer = await sharp(rawLogo)
             .resize(600, 600, { fit: "contain", background: { r: 15, g: 23, b: 42, alpha: 1 } })
             .jpeg({ quality: 90 })
             .toBuffer();
           imageMime = "image/jpeg";
-        } catch {
-          imageBuffer = fs.readFileSync(defaultLogoPath);
-          imageMime = "image/png";
         }
+      } catch (e) {
+        console.warn("Could not prepare fallback logo for tagging:", e);
       }
     }
 
