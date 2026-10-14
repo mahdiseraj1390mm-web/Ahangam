@@ -82,6 +82,43 @@ export function SongUploadForm({ artists, albums, genres }: SongUploadFormProps)
         }
       };
 
+      // Automatically extract embedded ID3 metadata & cover art from the audio file
+      try {
+        const headerSlice = file.slice(0, 3 * 1024 * 1024); // First 3MB contains ID3 header and APIC cover art
+        const metaFormData = new FormData();
+        metaFormData.append("file", headerSlice, file.name);
+        fetch("/api/admin/songs/extract-metadata", {
+          method: "POST",
+          body: metaFormData,
+        })
+          .then((res) => res.json())
+          .then((meta) => {
+            if (meta?.success) {
+              if (meta.coverUrl) {
+                setCoverImage(meta.coverUrl);
+                setSuccess("کاور پیش‌فرض فایل صوتی با موفقیت استخراج و تنظیم شد.");
+                setTimeout(() => setSuccess(null), 4000);
+              }
+              if (meta.title && meta.title.length > 2) {
+                setTitle(meta.title);
+              }
+              if (meta.artist) {
+                const matched = artistList.find(
+                  (a) =>
+                    a.name.toLowerCase().includes(meta.artist.toLowerCase()) ||
+                    meta.artist.toLowerCase().includes(a.name.toLowerCase())
+                );
+                if (matched) {
+                  setArtistId(matched.id);
+                }
+              }
+            }
+          })
+          .catch((err) => console.warn("Auto metadata extraction non-blocking error:", err));
+      } catch (e) {
+        console.warn("Could not initiate metadata extraction:", e);
+      }
+
       // Upload file directly to cloud storage (bypassing server body size limits)
       try {
         setIsUploadingFile(true);
@@ -460,14 +497,19 @@ export function SongUploadForm({ artists, albums, genres }: SongUploadFormProps)
                 />
               </div>
 
-              <div className="sm:col-span-2 space-y-2">
+              <div className="sm:col-span-2 space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="block text-xs font-semibold text-content-secondary">
-                    تصویر کاور آهنگ
-                  </label>
-                  <label className="text-[11px] font-bold text-brand hover:underline cursor-pointer flex items-center gap-1">
+                  <div>
+                    <label className="block text-xs font-semibold text-content-secondary">
+                      تصویر کاور آهنگ
+                    </label>
+                    <span className="text-[11px] text-content-muted">
+                      (با انتخاب فایل صوتی، کاور پیش‌فرض داخل آهنگ خودکار استخراج می‌شود)
+                    </span>
+                  </div>
+                  <label className="text-[11px] font-bold text-brand bg-brand/10 hover:bg-brand/20 border border-brand/20 px-3 py-1.5 rounded-xl cursor-pointer flex items-center gap-1.5 transition-colors">
                     <Upload className="w-3.5 h-3.5" />
-                    <span>{isUploadingCover ? "در حال آپلود کاور..." : "انتخاب و آپلود عکس"}</span>
+                    <span>{isUploadingCover ? "در حال آپلود کاور..." : "آپلود / تغییر کاور"}</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -477,22 +519,43 @@ export function SongUploadForm({ artists, albums, genres }: SongUploadFormProps)
                     />
                   </label>
                 </div>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={coverImage}
-                    onChange={(e) => setCoverImage(e.target.value)}
-                    placeholder="آدرس اینترنتی کاور یا آپلود از دکمه بالا..."
-                    className="flex-1 p-2.5 rounded-xl bg-surface-50 border border-surface-border text-xs text-content-primary focus:outline-none focus:border-brand font-mono"
-                  />
-                  {coverImage && (
+
+                {coverImage ? (
+                  <div className="flex items-center gap-4 p-3 rounded-2xl bg-surface-50 border border-surface-border">
                     <img
                       src={coverImage}
                       alt="Cover Preview"
-                      className="w-10 h-10 rounded-lg object-cover border border-surface-border shrink-0"
+                      className="w-16 h-16 rounded-xl object-cover border border-surface-border shadow-sm shrink-0"
                     />
-                  )}
-                </div>
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-500">
+                        <Check className="w-3.5 h-3.5" />
+                        <span>کاور فعال آهنگ (در دانلود کاربران نیز داخل فایل تعبیه می‌شود)</span>
+                      </div>
+                      <input
+                        type="text"
+                        value={coverImage}
+                        onChange={(e) => setCoverImage(e.target.value)}
+                        placeholder="آدرس اینترنتی کاور..."
+                        className="w-full p-2 rounded-lg bg-surface-card border border-surface-border text-[11px] text-content-primary focus:outline-none focus:border-brand font-mono"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setCoverImage("")}
+                      className="text-xs text-red-400 hover:text-red-300 px-2 py-1 transition-colors cursor-pointer"
+                      title="حذف کاور"
+                    >
+                      حذف
+                    </button>
+                  </div>
+                ) : (
+                  <div className="p-4 rounded-2xl bg-surface-50/50 border border-dashed border-surface-border text-center space-y-1">
+                    <p className="text-xs text-content-muted">
+                      هنوز کاوری تنظیم نشده است. با انتخاب فایل صوتی، کاور پیش‌فرض داخل فایل قرار می‌گیرد، یا می‌توانید تصویر جدیدی انتخاب کنید.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

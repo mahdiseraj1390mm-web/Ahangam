@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 // @ts-ignore
 import NodeID3 from "node-id3";
+import sharp from "sharp";
 
 export async function GET(
   req: NextRequest,
@@ -71,32 +72,16 @@ export async function GET(
     }
 
     // 2. Determine cover image:
-    // If this song is currently featured in the Hero Banner, use the banner's configured image
-    let coverSource: string | null = null;
-    try {
-      const featuredSetting = await prisma.siteSetting.findUnique({
-        where: { key: "FEATURED_SONG_OF_THE_DAY" },
-      });
-      if (featuredSetting?.value) {
-        const parsed = JSON.parse(featuredSetting.value);
-        if (parsed.songId === song.id && parsed.bannerImage) {
-          coverSource = parsed.bannerImage;
-        }
-      }
-    } catch {}
+    // Use the song's official cover image (whether auto-extracted or overridden by admin)
+    let coverSource: string | null = song.coverImage;
 
-    // If not from banner, use song coverImage
-    if (!coverSource) {
-      coverSource = song.coverImage;
-    }
-
-    // Fallback strictly to the site's default logo, NEVER the original singer's cover art
+    // Fallback to the site's default logo if no cover is set
     if (!coverSource || coverSource.trim() === "") {
       coverSource = "/logo.png";
     }
 
     let imageBuffer: Buffer | null = null;
-    let imageMime = "image/png";
+    let imageMime = "image/jpeg";
 
     if (coverSource) {
       try {
@@ -108,14 +93,6 @@ export async function GET(
           );
           if (fs.existsSync(localCoverPath)) {
             imageBuffer = fs.readFileSync(localCoverPath);
-            if (localCoverPath.toLowerCase().endsWith(".png")) {
-              imageMime = "image/png";
-            } else if (
-              localCoverPath.toLowerCase().endsWith(".jpg") ||
-              localCoverPath.toLowerCase().endsWith(".jpeg")
-            ) {
-              imageMime = "image/jpeg";
-            }
           }
         }
         if (!imageBuffer) {
@@ -127,8 +104,19 @@ export async function GET(
           if (coverResp.ok) {
             const coverArr = await coverResp.arrayBuffer();
             imageBuffer = Buffer.from(coverArr);
-            const contentType = coverResp.headers.get("content-type");
-            if (contentType) imageMime = contentType;
+          }
+        }
+
+        // Standardize cover art to 600x600 square JPEG for 100% universal player compatibility
+        if (imageBuffer) {
+          try {
+            imageBuffer = await sharp(imageBuffer)
+              .resize(600, 600, { fit: "cover" })
+              .jpeg({ quality: 90 })
+              .toBuffer();
+            imageMime = "image/jpeg";
+          } catch (sharpErr) {
+            console.warn("Sharp image conversion fallback:", sharpErr);
           }
         }
       } catch (err) {
@@ -140,8 +128,17 @@ export async function GET(
     if (!imageBuffer) {
       const defaultLogoPath = path.join(process.cwd(), "public", "logo.png");
       if (fs.existsSync(defaultLogoPath)) {
-        imageBuffer = fs.readFileSync(defaultLogoPath);
-        imageMime = "image/png";
+        try {
+          const rawLogo = fs.readFileSync(defaultLogoPath);
+          imageBuffer = await sharp(rawLogo)
+            .resize(600, 600, { fit: "contain", background: { r: 15, g: 23, b: 42, alpha: 1 } })
+            .jpeg({ quality: 90 })
+            .toBuffer();
+          imageMime = "image/jpeg";
+        } catch {
+          imageBuffer = fs.readFileSync(defaultLogoPath);
+          imageMime = "image/png";
+        }
       }
     }
 
@@ -149,10 +146,11 @@ export async function GET(
     const tags: any = {
       title: song.title,
       artist: song.artist?.name || "Ahangam",
-      album: song.album?.title || "Ahangam Single",
+      album: song.album?.title || "رسانه موسیقی آهنگام",
+      publisher: "آهنگام",
       comment: {
         language: "eng",
-        text: "Downloaded from Ahangam",
+        text: "Downloaded from Ahangam (ahangam-b18n.vercel.app)",
       },
     };
 
