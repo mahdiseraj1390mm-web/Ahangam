@@ -38,6 +38,7 @@
     "postcss": "^8.5.3",
     "prisma": "^6.4.1",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "@netlify/plugin-nextjs": "^5.16.5"
   }
 }
